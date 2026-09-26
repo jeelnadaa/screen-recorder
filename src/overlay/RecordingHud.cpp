@@ -1,4 +1,4 @@
-#include "overlay/RecordingHud.h"
+#include "../../include/overlay/RecordingHud.h"
 #include <iostream>
 
 #if defined(_WIN32)
@@ -6,7 +6,8 @@
 #pragma comment(lib, "gdi32.lib")
 #endif
 
-namespace Recorder::Overlay {
+namespace Recorder {
+namespace Overlay {
 
     RecordingHud::RecordingHud() = default;
 
@@ -26,41 +27,47 @@ namespace Recorder::Overlay {
                 RECT r;
                 GetClientRect(hwnd, &r);
 
-                // Draw sleek rounded pill
-                HBRUSH bgBrush = CreateSolidBrush(RGB(20, 20, 20));
+                // Deep black pill background matching Image 2
+                HBRUSH bgBrush = CreateSolidBrush(RGB(18, 18, 20));
                 FillRect(hdc, &r, bgBrush);
                 DeleteObject(bgBrush);
 
-                // Draw red dot (or yellow if paused)
-                COLORREF dotColor = (self && self->m_isPaused) ? RGB(255, 200, 0) : RGB(235, 40, 40);
+                // Antialiased red dot (or amber if paused)
+                COLORREF dotColor = (self && self->m_isPaused) ? RGB(245, 181, 26) : RGB(234, 46, 46);
                 HBRUSH dotBrush = CreateSolidBrush(dotColor);
                 HGDIOBJ oldBrush = SelectObject(hdc, dotBrush);
                 HPEN nullPen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
                 HGDIOBJ oldPen = SelectObject(hdc, nullPen);
 
-                Ellipse(hdc, 12, 11, 24, 23);
+                // 10px diameter dot, perfectly centered
+                int dotY = (r.bottom - 10) / 2;
+                Ellipse(hdc, 16, dotY, 26, dotY + 10);
 
                 SelectObject(hdc, oldBrush);
                 SelectObject(hdc, oldPen);
                 DeleteObject(dotBrush);
                 DeleteObject(nullPen);
 
-                // Format time string
+                // Format time string: "02:14" matching Image 2
                 uint64_t totalSeconds = (self ? self->m_elapsedMs : 0) / 1000;
                 uint64_t hrs = totalSeconds / 3600;
                 uint64_t mins = (totalSeconds % 3600) / 60;
                 uint64_t secs = totalSeconds % 60;
 
                 wchar_t timeStr[32];
-                swprintf_s(timeStr, L"%02llu:%02llu:%02llu", hrs, mins, secs);
+                if (hrs > 0) {
+                    swprintf_s(timeStr, L"%02llu:%02llu:%02llu", hrs, mins, secs);
+                } else {
+                    swprintf_s(timeStr, L"%02llu:%02llu", mins, secs);
+                }
 
                 SetBkMode(hdc, TRANSPARENT);
-                SetTextColor(hdc, RGB(255, 255, 255));
-                HFONT font = CreateFontW(14, 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
+                SetTextColor(hdc, RGB(245, 245, 247));
+                HFONT font = CreateFontW(15, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
                 HGDIOBJ oldFont = SelectObject(hdc, font);
 
-                RECT textRect = { 32, 7, r.right - 8, r.bottom };
-                DrawTextW(hdc, timeStr, -1, &textRect, DT_SINGLELINE | DT_VCENTER);
+                RECT textRect = { 32, 0, r.right - 12, r.bottom };
+                DrawTextW(hdc, timeStr, -1, &textRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 
                 SelectObject(hdc, oldFont);
                 DeleteObject(font);
@@ -69,7 +76,7 @@ namespace Recorder::Overlay {
                 return 0;
             }
             case WM_NCHITTEST:
-                return HTCAPTION; // Allow dragging HUD around screen
+                return HTCAPTION; // Allow dragging HUD smoothly anywhere on screen
             default:
                 return DefWindowProcW(hwnd, msg, wParam, lParam);
         }
@@ -88,12 +95,18 @@ namespace Recorder::Overlay {
         wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
         RegisterClassExW(&wc);
 
+        int screenW = GetSystemMetrics(SM_CXSCREEN);
+        int hudW = 105;
+        int hudH = 36;
+        int posX = screenW - hudW - 40;
+        int posY = 40;
+
         m_hwnd = CreateWindowExW(
             WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
             wc.lpszClassName,
             L"ScreenRecorderHUD",
             WS_POPUP | WS_VISIBLE,
-            40, 40, 115, 34,
+            posX, posY, hudW, hudH,
             nullptr, nullptr, wc.hInstance, nullptr
         );
 
@@ -101,11 +114,11 @@ namespace Recorder::Overlay {
 
         SetWindowLongPtrW(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-        // Critical: Exclude this overlay window from screen capture!
+        // Critical requirement: Exclude overlay from capture via Windows API
         SetWindowDisplayAffinity(m_hwnd, WDA_EXCLUDEFROMCAPTURE);
 
-        // Make edges rounded
-        HRGN rgn = CreateRoundRectRgn(0, 0, 115, 34, 16, 16);
+        // Rounded pill capsule region
+        HRGN rgn = CreateRoundRectRgn(0, 0, hudW, hudH, hudH, hudH);
         SetWindowRgn(m_hwnd, rgn, TRUE);
 
         return true;
@@ -150,4 +163,5 @@ namespace Recorder::Overlay {
 #endif
     }
 
-} // namespace Recorder::Overlay
+} // namespace Overlay
+} // namespace Recorder

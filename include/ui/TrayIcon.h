@@ -8,7 +8,8 @@
 #include <shellapi.h>
 #endif
 
-namespace Recorder::Ui {
+namespace Recorder {
+namespace Ui {
 
     class TrayIcon {
     public:
@@ -26,6 +27,8 @@ namespace Recorder::Ui {
         void SetOnStartRecord(std::function<void()> cb) { m_onStartRecord = cb; }
         void SetOnStopRecord(std::function<void()> cb) { m_onStopRecord = cb; }
         void SetOnSaveReplay(std::function<void()> cb) { m_onSaveReplay = cb; }
+        void SetOnScreenshot(std::function<void()> cb) { m_onScreenshot = cb; }
+        void SetOnApplyPreset(std::function<void(int)> cb) { m_onApplyPreset = cb; }
         void SetOnRestoreWindow(std::function<void()> cb) { m_onRestore = cb; }
         void SetOnExitApp(std::function<void()> cb) { m_onExit = cb; }
 
@@ -39,8 +42,11 @@ namespace Recorder::Ui {
         std::function<void()> m_onStartRecord;
         std::function<void()> m_onStopRecord;
         std::function<void()> m_onSaveReplay;
+        std::function<void()> m_onScreenshot;
+        std::function<void(int)> m_onApplyPreset;
         std::function<void()> m_onRestore;
         std::function<void()> m_onExit;
     };
 
-} // namespace Recorder::Ui
+} // namespace Ui
+} // namespace Recorder

@@ -1,11 +1,13 @@
-#include "ui/TrayIcon.h"
+#include "../../include/ui/TrayIcon.h"
+#include "../../include/core/Engine.h"
 #include <iostream>
 
 #if defined(_WIN32)
 #pragma comment(lib, "shell32.lib")
 #endif
 
-namespace Recorder::Ui {
+namespace Recorder {
+namespace Ui {
 
     TrayIcon::TrayIcon() = default;
 
@@ -25,7 +27,7 @@ namespace Recorder::Ui {
         m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
         m_nid.uCallbackMessage = callbackMessageId;
         m_nid.hIcon = icon ? icon : LoadIconW(nullptr, IDI_APPLICATION);
-        wcscpy_s(m_nid.szTip, L"High-Performance Screen Recorder");
+        wcscpy_s(m_nid.szTip, L"Screen Recorder");
 
         m_added = (Shell_NotifyIconW(NIM_ADD, &m_nid) == TRUE);
         return m_added;
@@ -51,12 +53,38 @@ namespace Recorder::Ui {
 
     void TrayIcon::ShowContextMenu(int x, int y) {
         HMENU hMenu = CreatePopupMenu();
-        AppendMenuW(hMenu, MF_STRING, 2001, L"Show Screen Recorder");
+
+        auto state = Core::Engine::Instance().GetState();
+        bool isRecording = (state == Core::EngineState::Recording || state == Core::EngineState::Paused);
+
+        // Menu items matching Image 3:
+        // 1. Start/Stop recording
+        if (isRecording) {
+            AppendMenuW(hMenu, MF_STRING, 2002, L"Stop recording");
+        } else {
+            AppendMenuW(hMenu, MF_STRING, 2002, L"Start recording");
+        }
+
+        // 2. Save replay clip
+        AppendMenuW(hMenu, MF_STRING, 2004, L"Save replay clip");
+
+        // 3. Screenshot
+        AppendMenuW(hMenu, MF_STRING, 2006, L"Screenshot");
+
+        // 4. Presets submenu
+        HMENU hPresetMenu = CreatePopupMenu();
+        AppendMenuW(hPresetMenu, MF_STRING, 2101, L"High Quality (1440p60 HEVC)");
+        AppendMenuW(hPresetMenu, MF_STRING, 2102, L"Balanced (1080p60)");
+        AppendMenuW(hPresetMenu, MF_STRING, 2103, L"Esports (1080p120)");
+        AppendMenuW(hPresetMenu, MF_STRING, 2104, L"Low Latency (720p60)");
+        AppendMenuW(hMenu, MF_POPUP, reinterpret_cast<UINT_PTR>(hPresetMenu), L"Presets");
+
         AppendMenuW(hMenu, MF_SEPARATOR, 0, nullptr);
-        AppendMenuW(hMenu, MF_STRING, 2002, L"Start Recording");
-        AppendMenuW(hMenu, MF_STRING, 2003, L"Stop Recording");
-        AppendMenuW(hMenu, MF_STRING, 2004, L"Save Instant Replay");
-        AppendMenuW(hMenu, MF_SEPARATOR, 0, nullptr);
+
+        // 5. Open settings (Show/restore window)
+        AppendMenuW(hMenu, MF_STRING, 2001, L"Open settings");
+
+        // 6. Exit
         AppendMenuW(hMenu, MF_STRING, 2005, L"Exit");
 
         SetForegroundWindow(m_hwnd);
@@ -65,13 +93,25 @@ namespace Recorder::Ui {
 
         switch (cmd) {
             case 2001: if (m_onRestore) m_onRestore(); break;
-            case 2002: if (m_onStartRecord) m_onStartRecord(); break;
-            case 2003: if (m_onStopRecord) m_onStopRecord(); break;
+            case 2002: {
+                if (isRecording) {
+                    if (m_onStopRecord) m_onStopRecord();
+                } else {
+                    if (m_onStartRecord) m_onStartRecord();
+                }
+                break;
+            }
             case 2004: if (m_onSaveReplay) m_onSaveReplay(); break;
+            case 2006: if (m_onScreenshot) m_onScreenshot(); break;
+            case 2101: if (m_onApplyPreset) m_onApplyPreset(0); break;
+            case 2102: if (m_onApplyPreset) m_onApplyPreset(1); break;
+            case 2103: if (m_onApplyPreset) m_onApplyPreset(2); break;
+            case 2104: if (m_onApplyPreset) m_onApplyPreset(3); break;
             case 2005: if (m_onExit) m_onExit(); break;
             default: break;
         }
     }
 #endif
 
-} // namespace Recorder::Ui
+} // namespace Ui
+} // namespace Recorder

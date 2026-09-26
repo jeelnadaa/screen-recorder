@@ -77,7 +77,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, PWSTR 
 
     // 5. Initialize UI
     Recorder::Ui::MainWindow mainWindow;
-    if (mainWindow.Create(960, 640)) {
+    if (mainWindow.Create(860, 580)) {
         if (!startMinimized) {
             mainWindow.Show();
         }
