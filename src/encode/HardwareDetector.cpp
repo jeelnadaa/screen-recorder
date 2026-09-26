@@ -34,8 +34,7 @@ namespace Recorder::Encode {
             if (SUCCEEDED(hr) && count > 0 && ppActivate) {
                 WCHAR* name = nullptr;
                 UINT32 nameLen = 0;
-                if (SUCCEEDED(ppActivate[0]->GetAllocatedString(MF_TRANSFORM_ASYNC_MFT, &name, &nameLen)) ||
-                    SUCCEEDED(ppActivate[0]->GetAllocatedString(MFT_FRIENDLY_NAME_Attribute, &name, &nameLen))) {
+                if (SUCCEEDED(ppActivate[0]->GetAllocatedString(MFT_FRIENDLY_NAME_Attribute, &name, &nameLen))) {
                     outName = name;
                     CoTaskMemFree(name);
                 }

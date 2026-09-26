@@ -3,6 +3,7 @@
 
 #if defined(_WIN32)
 #include <wmcodecdsp.h>
+#include <mferror.h>
 #pragma comment(lib, "wmcodecdspuuid.lib")
 #endif
 

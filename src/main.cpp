@@ -9,7 +9,7 @@
 #include <shellapi.h>
 #endif
 
-int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, PWSTR pCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, PWSTR /*pCmdLine*/, int /*nCmdShow*/) {
 #if defined(_WIN32)
     // 1. Handle command-line arguments and CLI automation
     int argc = 0;

@@ -282,7 +282,7 @@ namespace Recorder::Ui {
         auto telem = Core::Engine::Instance().GetTelemetry();
 
         // Status pill
-        std::wstring statusText = L"Status: " + std::wstring(Core::ToString(state) ? Core::ToString(state) : "");
+        std::wstring statusText = L"Status: " + std::wstring(Core::ToWString(state));
         ColorRGB statusColor = (state == Core::EngineState::Recording) ? Theme::RecordRed : Theme::TextSecondary;
         m_renderer.DrawText(statusText, left + 24.0f, top + 24.0f, left + 180.0f, top + 46.0f, statusColor, 14.0f, true);
 
@@ -372,8 +372,8 @@ namespace Recorder::Ui {
         m_renderer.DrawText(L"Audio Mixer & Monitoring", left, top, right, top + 30.0f, Theme::TextPrimary, 18.0f, true);
 
         auto& engine = Core::Engine::Instance();
-        float sysVu = 0.4f; // live VU
-        float micVu = 0.2f;
+        float sysVu = 0.4f;
+        float micVu = engine.IsMicMuted() ? 0.0f : 0.25f;
 
         float cardTop = top + 50.0f;
         m_renderer.FillRect(left, cardTop, right, cardTop + 140.0f, Theme::SurfaceCard, 8.0f);

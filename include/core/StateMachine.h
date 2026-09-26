@@ -17,7 +17,7 @@ namespace Recorder::Core {
         void ResetToIdle();
 
     private:
-        mutable std::mutex m_mutex;
+        mutable std::recursive_mutex m_mutex;
         EngineState m_currentState;
     };
 

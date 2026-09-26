@@ -5,8 +5,15 @@
 #include "replay/CircularBuffer.h"
 #include "mux/MkvMuxer.h"
 #include <iostream>
-#include <cassert>
 #include <filesystem>
+#include <cstdlib>
+
+#define VERIFY(expr) do { \
+    if (!(expr)) { \
+        std::cerr << "[FAIL] Assertion failed: " #expr " at line " << __LINE__ << std::endl; \
+        std::exit(1); \
+    } \
+} while(0)
 
 void TestPathTemplates() {
     std::cout << "[RUNNING] TestPathTemplates..." << std::endl;
@@ -23,17 +30,17 @@ void TestPathTemplates() {
     std::wstring result = Recorder::Config::PathTemplates::ResolveFileName(tpl, ctx);
 
     // Verify invalid characters ':' and '/' were sanitized to '_'
-    assert(result.find(L":") == std::wstring::npos);
-    assert(result.find(L"/") == std::wstring::npos);
-    assert(result.find(L"2560x1440") != std::wstring::npos);
-    assert(result.find(L"144fps") != std::wstring::npos);
-    assert(result.find(L"HEVC") != std::wstring::npos);
+    VERIFY(result.find(L":") == std::wstring::npos);
+    VERIFY(result.find(L"/") == std::wstring::npos);
+    VERIFY(result.find(L"2560x1440") != std::wstring::npos);
+    VERIFY(result.find(L"144fps") != std::wstring::npos);
+    VERIFY(result.find(L"HEVC") != std::wstring::npos);
 
     std::wstring fullPath = Recorder::Config::PathTemplates::CombinePath(L"D:\\Captures", result, L"mkv");
-    assert(fullPath.find(L".mkv") != std::wstring::npos);
-    assert(fullPath.rfind(L"D:\\Captures\\", 0) == 0);
+    VERIFY(fullPath.find(L".mkv") != std::wstring::npos);
+    VERIFY(fullPath.rfind(L"D:\\Captures\\", 0) == 0);
 
-    std::cout << "  -> Resolved: " << std::string(result.begin(), result.end()) << std::endl;
+    std::wcout << L"  -> Resolved: " << result << std::endl;
     std::cout << "[PASSED] TestPathTemplates" << std::endl;
 }
 
@@ -52,18 +59,18 @@ void TestSettingsSerialization() {
 
     std::wstring testFile = L"test_config.json";
     bool saved = sm.SaveToFile(testFile);
-    assert(saved);
+    VERIFY(saved);
 
     // Reset and reload
     sm.SetDefaults();
-    assert(sm.Get().video.width == 1920);
+    VERIFY(sm.Get().video.width == 1920);
 
     bool loaded = sm.LoadFromFile(testFile);
-    assert(loaded);
-    assert(sm.Get().video.width == 3840);
-    assert(sm.Get().video.height == 2160);
-    assert(sm.Get().video.targetFps == 120);
-    assert(sm.Get().video.codec == Recorder::Core::VideoCodec::AV1);
+    VERIFY(loaded);
+    VERIFY(sm.Get().video.width == 3840);
+    VERIFY(sm.Get().video.height == 2160);
+    VERIFY(sm.Get().video.targetFps == 120);
+    VERIFY(sm.Get().video.codec == Recorder::Core::VideoCodec::AV1);
 
     std::filesystem::remove(testFile);
     std::cout << "[PASSED] TestSettingsSerialization" << std::endl;
@@ -74,21 +81,21 @@ void TestPresets() {
 
     auto& pm = Recorder::Config::PresetManager::Instance();
     auto presets = pm.GetAvailablePresets();
-    assert(presets.size() >= 3);
+    VERIFY(presets.size() >= 3);
 
     bool foundGaming = false;
     for (const auto& p : presets) {
         if (p.id == L"gaming_low_overhead") {
             foundGaming = true;
-            assert(p.settings.video.bitrateMode == Recorder::Core::BitrateMode::CQP);
-            assert(!p.settings.video.allowSoftwareFallback);
+            VERIFY(p.settings.video.bitrateMode == Recorder::Core::BitrateMode::CQP);
+            VERIFY(!p.settings.video.allowSoftwareFallback);
         }
     }
-    assert(foundGaming);
+    VERIFY(foundGaming);
 
     bool applied = pm.ApplyPreset(L"esports_high_fps");
-    assert(applied);
-    assert(Recorder::Config::SettingsManager::Instance().Get().video.targetFps == 120);
+    VERIFY(applied);
+    VERIFY(Recorder::Config::SettingsManager::Instance().Get().video.targetFps == 120);
 
     std::cout << "[PASSED] TestPresets" << std::endl;
 }
@@ -97,21 +104,21 @@ void TestStateMachine() {
     std::cout << "[RUNNING] TestStateMachine..." << std::endl;
 
     Recorder::Core::StateMachine sm;
-    assert(sm.GetState() == Recorder::Core::EngineState::Idle);
+    VERIFY(sm.GetState() == Recorder::Core::EngineState::Idle);
 
     // Valid lifecycle flow
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Starting));
-    assert(sm.GetState() == Recorder::Core::EngineState::Starting);
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Starting));
+    VERIFY(sm.GetState() == Recorder::Core::EngineState::Starting);
 
     // Invalid transition
-    assert(!sm.TransitionTo(Recorder::Core::EngineState::Paused));
+    VERIFY(!sm.TransitionTo(Recorder::Core::EngineState::Paused));
 
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Recording));
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Paused));
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Recording));
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Stopping));
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Remuxing));
-    assert(sm.TransitionTo(Recorder::Core::EngineState::Idle));
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Recording));
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Paused));
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Recording));
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Stopping));
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Remuxing));
+    VERIFY(sm.TransitionTo(Recorder::Core::EngineState::Idle));
 
     std::cout << "[PASSED] TestStateMachine" << std::endl;
 }
@@ -140,10 +147,10 @@ void TestCircularReplayBuffer() {
         buffer.PushPacket(std::move(df));
     }
 
-    assert(buffer.GetPacketCount() == 61);
+    VERIFY(buffer.GetPacketCount() == 61);
     auto snapshot = buffer.SnapshotPackets();
-    assert(!snapshot.empty());
-    assert(snapshot.front().isKeyframe); // First packet must be keyframe!
+    VERIFY(!snapshot.empty());
+    VERIFY(snapshot.front().isKeyframe); // First packet must be keyframe!
 
     std::cout << "  -> Replay buffer duration: " << buffer.GetBufferedDurationMs() << " ms" << std::endl;
     std::cout << "[PASSED] TestCircularReplayBuffer" << std::endl;
@@ -160,8 +167,8 @@ void TestMkvMuxer() {
     cfg.video.codec = Recorder::Core::VideoCodec::H264;
 
     bool opened = muxer.Open(cfg);
-    assert(opened);
-    assert(muxer.IsOpen());
+    VERIFY(opened);
+    VERIFY(muxer.IsOpen());
 
     // Write Keyframe
     Recorder::Core::MediaPacket kf;
@@ -170,7 +177,7 @@ void TestMkvMuxer() {
     kf.ptsHns = 10000000; // 1.0s
     kf.data = { 0x00, 0x00, 0x00, 0x01, 0x65, 0x88, 0x84 };
     bool written = muxer.WritePacket(kf);
-    assert(written);
+    VERIFY(written);
 
     // Write Delta frame
     Recorder::Core::MediaPacket df;
@@ -179,13 +186,13 @@ void TestMkvMuxer() {
     df.ptsHns = 10166666;
     df.data = { 0x00, 0x00, 0x00, 0x01, 0x41 };
     written = muxer.WritePacket(df);
-    assert(written);
+    VERIFY(written);
 
-    assert(muxer.GetBytesWritten() > 0);
+    VERIFY(muxer.GetBytesWritten() > 0);
     muxer.Close();
 
-    assert(std::filesystem::exists("test_output.mkv"));
-    assert(std::filesystem::file_size("test_output.mkv") > 50);
+    VERIFY(std::filesystem::exists("test_output.mkv"));
+    VERIFY(std::filesystem::file_size("test_output.mkv") > 50);
 
     std::filesystem::remove("test_output.mkv");
     std::cout << "[PASSED] TestMkvMuxer" << std::endl;

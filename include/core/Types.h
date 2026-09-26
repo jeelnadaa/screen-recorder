@@ -32,6 +32,19 @@ namespace Recorder::Core {
         }
     }
 
+    inline const wchar_t* ToWString(EngineState state) {
+        switch (state) {
+            case EngineState::Idle: return L"Idle";
+            case EngineState::Starting: return L"Starting";
+            case EngineState::Recording: return L"Recording";
+            case EngineState::Paused: return L"Paused";
+            case EngineState::Stopping: return L"Stopping";
+            case EngineState::Remuxing: return L"Remuxing";
+            case EngineState::Faulted: return L"Faulted";
+            default: return L"Unknown";
+        }
+    }
+
     enum class CaptureSourceType {
         Monitor,
         Window,

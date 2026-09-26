@@ -6,12 +6,12 @@ namespace Recorder::Core {
     StateMachine::StateMachine() : m_currentState(EngineState::Idle) {}
 
     EngineState StateMachine::GetState() const {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::recursive_mutex> lock(m_mutex);
         return m_currentState;
     }
 
     bool StateMachine::CanTransitionTo(EngineState targetState) const {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::recursive_mutex> lock(m_mutex);
         if (m_currentState == targetState) return false;
 
         switch (m_currentState) {
@@ -44,7 +44,7 @@ namespace Recorder::Core {
     bool StateMachine::TransitionTo(EngineState targetState) {
         EngineState previousState;
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard<std::recursive_mutex> lock(m_mutex);
             if (!CanTransitionTo(targetState)) {
                 return false;
             }
@@ -60,7 +60,7 @@ namespace Recorder::Core {
     void StateMachine::ResetToIdle() {
         EngineState previousState;
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard<std::recursive_mutex> lock(m_mutex);
             previousState = m_currentState;
             m_currentState = EngineState::Idle;
         }

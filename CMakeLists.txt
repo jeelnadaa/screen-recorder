@@ -16,6 +16,7 @@ if(MSVC)
         /utf-8
         /EHsc
         /MP
+        /wd4324
     )
     # Release optimizations
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Oi /Ot /GL")
