@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MuxTypes.h"
-#include "core/Types.h"
+#include "../core/Types.h"
 #include <fstream>
 #include <mutex>
 #include <vector>

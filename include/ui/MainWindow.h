@@ -3,7 +3,7 @@
 #include "UITheme.h"
 #include "Direct2DRenderer.h"
 #include "TrayIcon.h"
-#include "core/Types.h"
+#include "../core/Types.h"
 #include <string>
 #include <vector>
 
