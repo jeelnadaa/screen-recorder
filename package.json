@@ -1,0 +1,25 @@
+{
+  "name": "screen-recorder",
+  "version": "1.0.0",
+  "description": "A state-of-the-art native Windows screen recording desktop application built from the ground up for **near-zero performance footprint** during high-demand 3D gaming and workstation tasks.",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "build\\bin\\Release\\ScreenRecorderTests.exe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeelnadaa/screen-recorder.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jeelnadaa/screen-recorder/issues"
+  },
+  "homepage": "https://github.com/jeelnadaa/screen-recorder#readme",
+  "devDependencies": {
+    "electron": "^44.4.5"
+  }
+}

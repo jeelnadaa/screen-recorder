@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberRec // Pro Hardware Screen Recorder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Maximalist Header & Titlebar -->
+        <header class="cyber-header">
+            <div class="header-left">
+                <div class="app-logo-badge">
+                    <img src="../assets/app_logo.png" alt="CyberRec Logo" class="app-logo-img">
+                    <div class="logo-glow-ring"></div>
+                </div>
+                <div class="app-title-group">
+                    <div class="title-row">
+                        <span class="brand-title">CYBERREC</span>
+                        <span class="brand-sub">STUDIO PRO</span>
+                        <span class="build-tag">v2.4 NVENC_D3D11</span>
+                    </div>
+                    <div class="telemetry-bar">
+                        <span class="tele-item"><i class="status-dot green pulse"></i> PIPELINE: <strong id="teleEngine">DIRECT3D 11 WGC</strong></span>
+                        <span class="tele-sep">/</span>
+                        <span class="tele-item">GPU: <strong id="teleGpu">NVIDIA RTX ZERO-COPY</strong></span>
+                        <span class="tele-sep">/</span>
+                        <span class="tele-item">STATUS: <strong id="teleStateBadge" class="state-idle">IDLE</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central HUD Quick Recorder Widget -->
+            <div class="header-center-hud">
+                <div class="hud-capsule" id="quickRecordCapsule">
+                    <div class="hud-rec-indicator">
+                        <span class="rec-dot" id="recDot"></span>
+                        <span class="rec-time" id="recTimeText">00:00:00</span>
+                    </div>
+                    <div class="hud-actions">
+                        <button class="hud-btn rec-btn" id="btnRecordToggle" title="Start/Stop Recording (Ctrl+Shift+R)">
+                            <span class="btn-icon">⏺</span>
+                            <span class="btn-label" id="btnRecordLabel">RECORD</span>
+                        </button>
+                        <button class="hud-btn pause-btn" id="btnPauseToggle" title="Pause/Resume (Ctrl+Shift+P)" disabled>
+                            <span class="btn-icon">⏸</span>
+                        </button>
+                        <button class="hud-btn replay-btn" id="btnSaveReplay" title="Save Instant Replay (Ctrl+Shift+S)">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-label">REPLAY</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Window Controls -->
+            <div class="header-right">
+                <button class="win-btn win-minimize" id="btnWinMinimize" title="Minimize">−</button>
+                <button class="win-btn win-maximize" id="btnWinMaximize" title="Maximize">□</button>
+                <button class="win-btn win-close" id="btnWinClose" title="Close (Minimizes to Tray)">✕</button>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <div class="app-body">
+            <!-- Maximalist Navigation Sidebar -->
+            <nav class="cyber-nav">
+                <div class="nav-section-title">ENGINE COCKPIT</div>
+                <button class="nav-tab active" data-tab="preview">
+                    <span class="nav-icon">👁️</span>
+                    <span class="nav-text">Live Viewfinder</span>
+                    <span class="nav-badge pulse">LIVE</span>
+                </button>
+                <button class="nav-tab" data-tab="source">
+                    <span class="nav-icon">🖥️</span>
+                    <span class="nav-text">Capture Sources</span>
+                </button>
+                <button class="nav-tab" data-tab="audio">
+                    <span class="nav-icon">🎙️</span>
+                    <span class="nav-text">Audio & Mic Studio</span>
+                    <span class="nav-badge accent">PRO</span>
+                </button>
+                <button class="nav-tab" data-tab="video">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-text">GPU & Codec</span>
+                </button>
+                <button class="nav-tab" data-tab="overlays">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">Cursor & Overlays</span>
+                </button>
+                <button class="nav-tab" data-tab="storage">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Output & Remux</span>
+                </button>
+                <button class="nav-tab" data-tab="library">
+                    <span class="nav-icon">🎬</span>
+                    <span class="nav-text">Recordings Vault</span>
+                    <span class="nav-counter" id="recordingsCount">0</span>
+                </button>
+
+                <div class="sidebar-spacer"></div>
+
+                <!-- Live System Tray Quick Status Box -->
+                <div class="tray-status-card">
+                    <div class="tray-card-header">
+                        <span class="tray-icon-symbol">💠</span>
+                        <span class="tray-card-title">TRAY AGENT ACTIVE</span>
+                    </div>
+                    <div class="tray-card-desc">Left-click tray icon to focus, right-click for quick actions menu.</div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area with Dynamic Views -->
+            <main class="cyber-viewport">
+                <!-- TAB 1: Live Viewfinder / Capture Source Preview -->
+                <section class="tab-pane active" id="pane-preview">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">LIVE CAPTURE VIEWFINDER</h2>
+                            <p class="pane-subtitle">Real-time hardware pipeline stream preview with framing guides & active telemetry</p>
+                        </div>
+                        <div class="pane-header-actions">
+                            <button class="cyber-btn sm secondary" id="btnRefreshPreview">⟳ REFRESH STREAM</button>
+                            <button class="cyber-btn sm primary" id="btnTogglePreviewView">DETACH VIEW</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Viewfinder Canvas Screen -->
+                    <div class="viewfinder-container">
+                        <div class="viewfinder-screen" id="viewfinderScreen">
+                            <video id="liveVideo" autoplay playsinline muted></video>
+                            
+                            <!-- Tactical HUD Overlays on Viewfinder -->
+                            <div class="hud-overlay-grid">
+                                <div class="hud-corner top-left">
+                                    <span class="hud-tag rec-tag" id="vfRecTag">● READY</span>
+                                    <span class="hud-tag fps-tag" id="vfFpsTag">60.0 FPS</span>
+                                </div>
+                                <div class="hud-corner top-right">
+                                    <span class="hud-tag res-tag" id="vfResTag">1920x1080</span>
+                                    <span class="hud-tag codec-tag" id="vfCodecTag">HEVC / CFR</span>
+                                </div>
+                                <div class="hud-crosshair"></div>
+                                <div class="hud-corner bottom-left">
+                                    <span class="hud-tag source-tag" id="vfSourceTag">Display 1 (Primary)</span>
+                                </div>
+                                <div class="hud-corner bottom-right">
+                                    <span class="hud-tag format-tag">NV12 4:2:0 HARDWARE</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Viewfinder Control Bar -->
+                        <div class="viewfinder-controls">
+                            <div class="vf-ctrl-left">
+                                <span class="vf-label">PREVIEW QUALITY:</span>
+                                <div class="pill-group" id="vfQualityPills">
+                                    <button class="pill-btn active" data-quality="1080">1080p</button>
+                                    <button class="pill-btn" data-quality="720">720p</button>
+                                    <button class="pill-btn" data-quality="native">Native</button>
+                                </div>
+                            </div>
+                            <div class="vf-ctrl-right">
+                                <label class="cyber-checkbox">
+                                    <input type="checkbox" id="chkShowHudCrosshair" checked>
+                                    <span class="chk-box"></span>
+                                    <span class="chk-text">Show Framing Crosshair</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: Capture Sources Grid -->
+                <section class="tab-pane" id="pane-source">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">CAPTURE SOURCE SELECTION</h2>
+                            <p class="pane-subtitle">Choose from physical display monitors or running game/workstation windows</p>
+                        </div>
+                        <div class="pill-group" id="sourceFilterPills">
+                            <button class="pill-btn active" data-filter="all">All Sources</button>
+                            <button class="pill-btn" data-filter="screens">Displays / Monitors</button>
+                            <button class="pill-btn" data-filter="windows">App Windows</button>
+                        </div>
+                    </div>
+
+                    <div class="sources-grid" id="sourcesGrid">
+                        <!-- Injected dynamically by renderer.js -->
+                        <div class="source-loading">Probing display monitors and window surfaces...</div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: Audio & Mic Studio (With Mic Sensitivity Control) -->
+                <section class="tab-pane" id="pane-audio">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">AUDIO MIXER & MIC SENSITIVITY STUDIO</h2>
+                            <p class="pane-subtitle">Hardware-accelerated WASAPI loopback, mic sensitivity boost, and real-time limiter</p>
+                        </div>
+                        <button class="cyber-btn sm" id="btnTestAudioMic">TEST AUDIO LOOP</button>
+                    </div>
+
+                    <div class="studio-grid">
+                        <!-- Microphone Channel Card with Full Sensitivity Control -->
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <div class="card-head-left">
+                                    <span class="card-icon">🎙️</span>
+                                    <span class="card-title">MICROPHONE SENSITIVITY & GAIN</span>
+                                </div>
+                                <label class="cyber-switch">
+                                    <input type="checkbox" id="chkMicEnable" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <!-- Real-time Mic VU Meter with Clipping LED -->
+                            <div class="vu-meter-block">
+                                <div class="vu-meta">
+                                    <span>MIC INPUT LEVEL</span>
+                                    <span class="vu-val" id="micVuVal">-18.4 dB</span>
+                                    <span class="clip-led" id="micClipLed">CLIP</span>
+                                </div>
+                                <div class="vu-bar-track">
+                                    <div class="vu-bar-fill mic-fill" id="micVuBar" style="width: 35%;"></div>
+                                    <div class="vu-peak-line" id="micPeakLine" style="left: 45%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Dedicated Mic Sensitivity Slider (0% to 200%) -->
+                            <div class="slider-control-group">
+                                <div class="slider-header">
+                                    <span class="slider-title">MIC SENSITIVITY (HARDWARE GAIN MULTIPLIER)</span>
+                                    <span class="slider-badge" id="micGainBadge">100% (0.0 dB)</span>
+                                </div>
+                                <input type="range" class="cyber-slider" id="micGainSlider" min="0" max="200" value="100" step="1">
+                                <div class="slider-scale">
+                                    <span>Mute (0%)</span>
+                                    <span>Standard (100%)</span>
+                                    <span>+6 dB Boost (150%)</span>
+                                    <span>+12 dB Max (200%)</span>
+                                </div>
+                            </div>
+
+                            <!-- Noise Gate Threshold -->
+                            <div class="slider-control-group">
+                                <div class="slider-header">
+                                    <span class="slider-title">NOISE SUPPRESSION GATE</span>
+                                    <span class="slider-badge" id="gateBadge">-42 dB</span>
+                                </div>
+                                <input type="range" class="cyber-slider" id="gateSlider" min="-60" max="-10" value="-42" step="1">
+                            </div>
+
+                            <div class="card-options">
+                                <label class="cyber-checkbox">
+                                    <input type="checkbox" id="chkMicPushToTalk">
+                                    <span class="chk-box"></span>
+                                    <span class="chk-text">Push to Talk (Key: Space or Ctrl)</span>
+                                </label>
+                                <label class="cyber-checkbox">
+                                    <input type="checkbox" id="chkSoftLimiter" checked>
+                                    <span class="chk-box"></span>
+                                    <span class="chk-text">Enable Soft-Knee Studio Limiter (Prevents Distortion)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- System Audio Loopback Channel Card -->
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <div class="card-head-left">
+                                    <span class="card-icon">🔊</span>
+                                    <span class="card-title">SYSTEM AUDIO LOOPBACK (WASAPI)</span>
+                                </div>
+                                <label class="cyber-switch">
+                                    <input type="checkbox" id="chkSysAudioEnable" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <!-- System Audio VU Meter -->
+                            <div class="vu-meter-block">
+                                <div class="vu-meta">
+                                    <span>SYSTEM AUDIO PEAK</span>
+                                    <span class="vu-val" id="sysVuVal">-12.0 dB</span>
+                                    <span class="clip-led" id="sysClipLed">CLIP</span>
+                                </div>
+                                <div class="vu-bar-track">
+                                    <div class="vu-bar-fill sys-fill" id="sysVuBar" style="width: 55%;"></div>
+                                    <div class="vu-peak-line" id="sysPeakLine" style="left: 65%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- System Volume Slider -->
+                            <div class="slider-control-group">
+                                <div class="slider-header">
+                                    <span class="slider-title">SYSTEM AUDIO VOLUME</span>
+                                    <span class="slider-badge" id="sysVolBadge">100%</span>
+                                </div>
+                                <input type="range" class="cyber-slider" id="sysVolSlider" min="0" max="100" value="100" step="1">
+                            </div>
+
+                            <!-- AAC Audio Bitrate Pills -->
+                            <div class="control-row">
+                                <span class="row-label">AAC ENCODING BITRATE:</span>
+                                <div class="pill-group" id="audioBitratePills">
+                                    <button class="pill-btn" data-kbps="128">128 kbps</button>
+                                    <button class="pill-btn active" data-kbps="192">192 kbps (Studio)</button>
+                                    <button class="pill-btn" data-kbps="320">320 kbps (Master)</button>
+                                </div>
+                            </div>
+
+                            <div class="card-options">
+                                <label class="cyber-checkbox">
+                                    <input type="checkbox" id="chkPerProcessAudio">
+                                    <span class="chk-box"></span>
+                                    <span class="chk-text">Isolate Current Game Audio (Exclude Discord/Spotify)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: GPU & Video Pipeline -->
+                <section class="tab-pane" id="pane-video">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">GPU HARDWARE ENCODING PIPELINE</h2>
+                            <p class="pane-subtitle">Direct3D 11 NVENC / QuickSync / AMF Hardware Video Pipeline Configuration</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-grid">
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <span class="card-title">TARGET ENCODING RESOLUTION</span>
+                            </div>
+                            <div class="pill-group wrap" id="videoResPills">
+                                <button class="pill-btn active" data-w="0" data-h="0">Native Display (3840x2160)</button>
+                                <button class="pill-btn" data-w="3840" data-h="2160">4K Ultra HD (3840x2160)</button>
+                                <button class="pill-btn" data-w="2560" data-h="1440">1440p QHD (2560x1440)</button>
+                                <button class="pill-btn" data-w="1920" data-h="1080">1080p Full HD (1920x1080)</button>
+                                <button class="pill-btn" data-w="1280" data-h="720">720p HD (1280x720)</button>
+                            </div>
+
+                            <div class="card-head mt-4">
+                                <span class="card-title">CAPTURE FRAME RATE</span>
+                            </div>
+                            <div class="pill-group" id="videoFpsPills">
+                                <button class="pill-btn" data-fps="240">240 FPS (Ultra)</button>
+                                <button class="pill-btn active" data-fps="144">144 FPS (Esports)</button>
+                                <button class="pill-btn" data-fps="120">120 FPS (High)</button>
+                                <button class="pill-btn" data-fps="60">60 FPS (Standard)</button>
+                                <button class="pill-btn" data-fps="30">30 FPS (Archive)</button>
+                            </div>
+                        </div>
+
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <span class="card-title">CODEC & BITRATE DYNAMICS</span>
+                            </div>
+                            
+                            <div class="control-row">
+                                <span class="row-label">CODEC:</span>
+                                <div class="pill-group" id="codecPills">
+                                    <button class="pill-btn active" data-codec="HEVC">HEVC / H.265 (Recommended)</button>
+                                    <button class="pill-btn" data-codec="AV1">AV1 (Next-Gen)</button>
+                                    <button class="pill-btn" data-codec="H264">H.264 / AVC (Universal)</button>
+                                </div>
+                            </div>
+
+                            <div class="slider-control-group mt-3">
+                                <div class="slider-header">
+                                    <span class="slider-title">TARGET VIDEO BITRATE</span>
+                                    <span class="slider-badge" id="videoBitrateBadge">30,000 kbps (30 Mbps)</span>
+                                </div>
+                                <input type="range" class="cyber-slider" id="videoBitrateSlider" min="5000" max="100000" value="30000" step="1000">
+                            </div>
+
+                            <div class="control-row mt-3">
+                                <span class="row-label">RATE CONTROL:</span>
+                                <div class="pill-group" id="rateControlPills">
+                                    <button class="pill-btn active" data-rc="CBR">Constant (CBR)</button>
+                                    <button class="pill-btn" data-rc="VBR">Variable (VBR)</button>
+                                    <button class="pill-btn" data-rc="CQP">Constant Quality (CQP)</button>
+                                </div>
+                            </div>
+
+                            <div class="card-options mt-4">
+                                <label class="cyber-checkbox">
+                                    <input type="checkbox" id="chkStrictHw" checked>
+                                    <span class="chk-box"></span>
+                                    <span class="chk-text">Strict Hardware Acceleration Only (Zero CPU Fallback)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: Cursor & Visual Overlays -->
+                <section class="tab-pane" id="pane-overlays">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">CURSOR & VISUAL OVERLAYS</h2>
+                            <p class="pane-subtitle">Configure cursor visibility, animated click ripples, and HUD badges</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-grid">
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <span class="card-title">MOUSE CURSOR RECORDING</span>
+                            </div>
+
+                            <div class="card-options">
+                                <!-- Hide Cursor Option -->
+                                <div class="toggle-card-row">
+                                    <div class="toggle-info">
+                                        <strong class="toggle-title">CAPTURE MOUSE CURSOR</strong>
+                                        <span class="toggle-desc">Turn off to completely hide cursor in recorded videos</span>
+                                    </div>
+                                    <label class="cyber-switch">
+                                        <input type="checkbox" id="chkCaptureCursor" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Highlight Clicks Option -->
+                                <div class="toggle-card-row mt-3">
+                                    <div class="toggle-info">
+                                        <strong class="toggle-title">HIGHLIGHT MOUSE CLICKS</strong>
+                                        <span class="toggle-desc">Renders animated neon ripple circles on mouse click</span>
+                                    </div>
+                                    <label class="cyber-switch">
+                                        <input type="checkbox" id="chkHighlightClicks" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Keystroke Overlays Option -->
+                                <div class="toggle-card-row mt-3">
+                                    <div class="toggle-info">
+                                        <strong class="toggle-title">KEYSTROKE HUD OVERLAYS</strong>
+                                        <span class="toggle-desc">Shows hotkeys and keypresses on screen in tutorials</span>
+                                    </div>
+                                    <label class="cyber-switch">
+                                        <input type="checkbox" id="chkShowKeystrokes">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <span class="card-title">CLICK RIPPLE CUSTOMIZATION</span>
+                            </div>
+
+                            <div class="control-row">
+                                <span class="row-label">RIPPLE ACCENT COLOR:</span>
+                                <div class="pill-group" id="clickColorPills">
+                                    <button class="pill-btn active" data-color="cyan">Electric Cyan</button>
+                                    <button class="pill-btn" data-color="ruby">Ruby Glow</button>
+                                    <button class="pill-btn" data-color="amber">Golden Amber</button>
+                                </div>
+                            </div>
+
+                            <div class="slider-control-group mt-3">
+                                <div class="slider-header">
+                                    <span class="slider-title">CLICK RIPPLE RADIUS</span>
+                                    <span class="slider-badge" id="rippleRadiusBadge">28 px</span>
+                                </div>
+                                <input type="range" class="cyber-slider" id="rippleRadiusSlider" min="16" max="64" value="28" step="2">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 6: Storage & Remux -->
+                <section class="tab-pane" id="pane-storage">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">STORAGE & AUTOMATIC MP4 REMUXING</h2>
+                            <p class="pane-subtitle">Crash-resilient Matroska (MKV) recording with zero-copy MP4 container remuxing</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-grid">
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <span class="card-title">OUTPUT DIRECTORY</span>
+                            </div>
+                            <div class="path-display-box">
+                                <input type="text" class="cyber-input" id="outputDirPath" readonly value="C:\Users\solarquack\Videos\Captures">
+                                <button class="cyber-btn sm secondary" id="btnBrowseOutput">BROWSE...</button>
+                                <button class="cyber-btn sm primary" id="btnOpenOutputFolder">OPEN FOLDER</button>
+                            </div>
+
+                            <div class="card-head mt-4">
+                                <span class="card-title">FILENAME TEMPLATE</span>
+                            </div>
+                            <div class="template-tokens-container">
+                                <input type="text" class="cyber-input" id="filenameTemplateInput" value="{app}_{date}_{time}_{res}_{fps}fps">
+                                <div class="token-chips">
+                                    <span class="chip" data-token="{app}">+{app}</span>
+                                    <span class="chip" data-token="{date}">+{date}</span>
+                                    <span class="chip" data-token="{time}">+{time}</span>
+                                    <span class="chip" data-token="{res}">+{res}</span>
+                                    <span class="chip" data-token="{fps}">+{fps}fps</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="studio-card">
+                            <div class="card-head">
+                                <span class="card-title">CONTAINER & REMUX POLICIES</span>
+                            </div>
+
+                            <div class="card-options">
+                                <div class="toggle-card-row">
+                                    <div class="toggle-info">
+                                        <strong class="toggle-title">AUTOMATIC LOSSLESS MP4 REMUX</strong>
+                                        <span class="toggle-desc">Instantly repackages MKV to universal MP4 upon recording stop without re-encoding</span>
+                                    </div>
+                                    <label class="cyber-switch">
+                                        <input type="checkbox" id="chkAutoRemuxMp4" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-card-row mt-3">
+                                    <div class="toggle-info">
+                                        <strong class="toggle-title">CLEANUP INTERMEDIATE MKV</strong>
+                                        <span class="toggle-desc">Automatically delete source MKV after successful MP4 remux to conserve storage</span>
+                                    </div>
+                                    <label class="cyber-switch">
+                                        <input type="checkbox" id="chkDeleteMkvAfterRemux" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 7: Recordings Vault / Library -->
+                <section class="tab-pane" id="pane-library">
+                    <div class="pane-header">
+                        <div class="pane-title-group">
+                            <h2 class="pane-title">RECORDINGS VAULT</h2>
+                            <p class="pane-subtitle">Access, play, reveal, or delete your high-framerate captures</p>
+                        </div>
+                        <div class="library-search-box">
+                            <input type="text" class="cyber-input sm" id="librarySearchInput" placeholder="Filter captures...">
+                            <button class="cyber-btn sm secondary" id="btnRefreshLibrary">⟳ REFRESH</button>
+                        </div>
+                    </div>
+
+                    <div class="recordings-list" id="recordingsList">
+                        <!-- Loaded dynamically -->
+                        <div class="source-loading">Scanning output folder for captures...</div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

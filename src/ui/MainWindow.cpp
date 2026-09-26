@@ -243,9 +243,18 @@ namespace Ui {
         BOOL useDarkMode = TRUE;
         DwmSetWindowAttribute(m_hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
 
+        HICON hIconBig = (HICON)LoadImageW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(101), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR);
+        HICON hIconSmall = (HICON)LoadImageW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(101), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+        if (!hIconBig) {
+            hIconBig = (HICON)LoadImageW(nullptr, L"assets\\app_logo.ico", IMAGE_ICON, 48, 48, LR_LOADFROMFILE);
+            hIconSmall = (HICON)LoadImageW(nullptr, L"assets\\app_logo.ico", IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+        }
+        if (hIconBig) SendMessageW(m_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIconBig);
+        if (hIconSmall) SendMessageW(m_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSmall);
+
         m_renderer.Initialize(m_hwnd);
         m_renderer.SetDpi(m_dpi);
-        m_trayIcon.Initialize(m_hwnd, WM_USER + 101);
+        m_trayIcon.Initialize(m_hwnd, WM_USER + 101, hIconSmall);
 
         m_trayIcon.SetOnRestoreWindow([this]() {
             ShowWindow(m_hwnd, SW_RESTORE);

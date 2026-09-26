@@ -26,3 +26,8 @@ Makefile
 *.mkv
 *.mp4
 test_config.json
+
+# Node & Frontend
+node_modules/
+ui-app/
+

@@ -97,6 +97,7 @@ set(CORE_HEADERS
 # Main desktop executable target
 add_executable(ScreenRecorder WIN32
     src/main.cpp
+    src/resource.rc
     ${CORE_SOURCES}
     ${CORE_HEADERS}
 )

@@ -26,8 +26,11 @@ namespace Ui {
         m_nid.uID = 1001;
         m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
         m_nid.uCallbackMessage = callbackMessageId;
+        if (!icon) {
+            icon = (HICON)LoadImageW(nullptr, L"assets\\app_logo.ico", IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+        }
         m_nid.hIcon = icon ? icon : LoadIconW(nullptr, IDI_APPLICATION);
-        wcscpy_s(m_nid.szTip, L"Screen Recorder");
+        wcscpy_s(m_nid.szTip, L"Screen Recorder Pro");
 
         m_added = (Shell_NotifyIconW(NIM_ADD, &m_nid) == TRUE);
         return m_added;
