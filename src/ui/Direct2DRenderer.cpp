@@ -442,6 +442,89 @@ namespace Ui {
             FillRect(left, top, left + width, bottom, barColor, 3.0f);
         }
     }
+
+    void Direct2DRenderer::DrawAppLogo(float cx, float cy, float radius) {
+        if (!m_renderTarget || !m_solidBrush) return;
+
+        // Outer glowing cyan/blue ring
+        ColorRGB glow = { 0.12f, 0.70f, 0.95f, 0.9f }; // #1eb3f2
+        DrawCircle(cx, cy, radius, glow, false, 2.0f);
+
+        // Dark obsidian inner base
+        ColorRGB base = { 0.06f, 0.07f, 0.09f, 1.0f };
+        DrawCircle(cx, cy, radius - 1.5f, base, true);
+
+        // 6 Aperture blades
+        ColorRGB bladeColor = { 0.08f, 0.45f, 0.88f, 1.0f };
+        for (int i = 0; i < 6; ++i) {
+            float angle = static_cast<float>(i) * 3.14159265f / 3.0f;
+            float rInner = radius * 0.38f;
+            float rOuter = radius * 0.88f;
+            float x1 = cx + cosf(angle) * rInner;
+            float y1 = cy + sinf(angle) * rInner;
+            float x2 = cx + cosf(angle + 0.8f) * rOuter;
+            float y2 = cy + sinf(angle + 0.8f) * rOuter;
+            DrawLine(x1, y1, x2, y2, bladeColor, 1.5f);
+        }
+
+        // Center glowing Ruby record dot
+        ColorRGB redHalo = { 0.85f, 0.15f, 0.15f, 0.4f };
+        DrawCircle(cx, cy, radius * 0.42f, redHalo, true);
+        ColorRGB redCore = { 0.96f, 0.20f, 0.20f, 1.0f };
+        DrawCircle(cx, cy, radius * 0.26f, redCore, true);
+    }
+
+    void Direct2DRenderer::DrawToggleSwitch(float x, float y, bool checked, bool hovered) {
+        float w = 44.0f;
+        float h = 24.0f;
+        float r = 12.0f;
+
+        ColorRGB bg = checked ? (hovered ? Theme::AccentBlueHover : Theme::AccentBlue)
+                              : (hovered ? Theme::SurfaceCardHover : Theme::BorderSubtle);
+
+        FillRect(x, y, x + w, y + h, bg, r);
+        if (!checked) {
+            DrawRect(x, y, x + w, y + h, Theme::BorderSubtle, 1.0f, r);
+        }
+
+        // Sliding knob
+        float knobR = 9.0f;
+        float knobY = y + 12.0f;
+        float knobX = checked ? (x + w - 13.0f) : (x + 13.0f);
+        DrawCircle(knobX, knobY, knobR, Theme::TextPrimary, true);
+    }
+
+    void Direct2DRenderer::DrawPillButton(float left, float top, float right, float bottom, const std::wstring& text, bool active, bool hovered) {
+        ColorRGB bg = active ? Theme::AccentBlue : (hovered ? Theme::SurfaceCardHover : Theme::SurfaceCard);
+        ColorRGB border = active ? Theme::BorderSelected : (hovered ? Theme::AccentBlueHover : Theme::BorderSubtle);
+        ColorRGB fg = active ? Theme::TextPrimary : (hovered ? Theme::TextPrimary : Theme::TextSecondary);
+
+        FillRect(left, top, right, bottom, bg, 6.0f);
+        DrawRect(left, top, right, bottom, border, active ? 1.5f : 1.0f, 6.0f);
+        DrawText(text, left, top, right, bottom, fg, 12.5f, active, true, true);
+    }
+
+    void Direct2DRenderer::DrawSlider(float left, float top, float right, float bottom, float value, const ColorRGB& barColor) {
+        float h = bottom - top;
+        float trackH = 6.0f;
+        float trackY = top + (h - trackH) * 0.5f;
+
+        // Background track
+        FillRect(left, trackY, right, trackY + trackH, Theme::SurfaceCardHover, 3.0f);
+
+        // Filled active track
+        float clamped = std::clamp(value, 0.0f, 1.0f);
+        float fillW = (right - left) * clamped;
+        if (fillW > 0.0f) {
+            FillRect(left, trackY, left + fillW, trackY + trackH, barColor, 3.0f);
+        }
+
+        // Slider Thumb Knob
+        float knobX = left + fillW;
+        float knobY = top + h * 0.5f;
+        DrawCircle(knobX, knobY, 7.0f, Theme::TextPrimary, true);
+        DrawCircle(knobX, knobY, 7.0f, Theme::AccentBlue, false, 1.5f);
+    }
 #endif
 
 } // namespace Ui

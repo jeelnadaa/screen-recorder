@@ -1,4 +1,5 @@
 #include "../../include/overlay/RecordingHud.h"
+#include "../../include/core/Engine.h"
 #include <iostream>
 
 #if defined(_WIN32)
@@ -27,28 +28,44 @@ namespace Overlay {
                 RECT r;
                 GetClientRect(hwnd, &r);
 
-                // Deep black pill background matching Image 2
-                HBRUSH bgBrush = CreateSolidBrush(RGB(18, 18, 20));
+                // Deep obsidian backdrop matching user's dark fluent theme
+                HBRUSH bgBrush = CreateSolidBrush(RGB(16, 17, 21));
                 FillRect(hdc, &r, bgBrush);
                 DeleteObject(bgBrush);
 
-                // Antialiased red dot (or amber if paused)
-                COLORREF dotColor = (self && self->m_isPaused) ? RGB(245, 181, 26) : RGB(234, 46, 46);
-                HBRUSH dotBrush = CreateSolidBrush(dotColor);
-                HGDIOBJ oldBrush = SelectObject(hdc, dotBrush);
+                bool isPaused = self ? self->m_isPaused : false;
+                COLORREF primaryColor = isPaused ? RGB(245, 181, 26) : RGB(234, 46, 46);
+
+                // Outer border glow
+                HPEN borderPen = CreatePen(PS_SOLID, 1, RGB(46, 48, 58));
+                HGDIOBJ oldBorderPen = SelectObject(hdc, borderPen);
+                HGDIOBJ oldBorderBrush = SelectObject(hdc, GetStockObject(NULL_BRUSH));
+                RoundRect(hdc, 0, 0, r.right, r.bottom, 26, 26);
+                SelectObject(hdc, oldBorderBrush);
+                SelectObject(hdc, oldBorderPen);
+                DeleteObject(borderPen);
+
+                // Prominent Pulsating Record Dot (14px diameter) with soft outer glow halo (22px)
+                HBRUSH haloBrush = CreateSolidBrush(isPaused ? RGB(70, 52, 10) : RGB(70, 18, 18));
+                HGDIOBJ oldBrush = SelectObject(hdc, haloBrush);
                 HPEN nullPen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
                 HGDIOBJ oldPen = SelectObject(hdc, nullPen);
 
-                // 10px diameter dot, perfectly centered
-                int dotY = (r.bottom - 10) / 2;
-                Ellipse(hdc, 16, dotY, 26, dotY + 10);
+                int haloY = (r.bottom - 22) / 2;
+                Ellipse(hdc, 15, haloY, 37, haloY + 22);
+
+                HBRUSH dotBrush = CreateSolidBrush(primaryColor);
+                SelectObject(hdc, dotBrush);
+                int dotY = (r.bottom - 14) / 2;
+                Ellipse(hdc, 19, dotY, 33, dotY + 14);
 
                 SelectObject(hdc, oldBrush);
                 SelectObject(hdc, oldPen);
+                DeleteObject(haloBrush);
                 DeleteObject(dotBrush);
                 DeleteObject(nullPen);
 
-                // Format time string: "02:14" matching Image 2
+                // Format time string: "02:14" in bold Segoe UI
                 uint64_t totalSeconds = (self ? self->m_elapsedMs : 0) / 1000;
                 uint64_t hrs = totalSeconds / 3600;
                 uint64_t mins = (totalSeconds % 3600) / 60;
@@ -63,11 +80,19 @@ namespace Overlay {
 
                 SetBkMode(hdc, TRANSPARENT);
                 SetTextColor(hdc, RGB(245, 245, 247));
-                HFONT font = CreateFontW(15, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
+                HFONT font = CreateFontW(18, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
                 HGDIOBJ oldFont = SelectObject(hdc, font);
 
-                RECT textRect = { 32, 0, r.right - 12, r.bottom };
+                RECT textRect = { 42, 0, r.right - 44, r.bottom };
                 DrawTextW(hdc, timeStr, -1, &textRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+
+                // Mini Stop Button Icon on right side
+                HBRUSH stopBrush = CreateSolidBrush(RGB(180, 180, 190));
+                SelectObject(hdc, stopBrush);
+                int stopY = (r.bottom - 12) / 2;
+                RECT stopRect = { r.right - 30, stopY, r.right - 18, stopY + 12 };
+                FillRect(hdc, &stopRect, stopBrush);
+                DeleteObject(stopBrush);
 
                 SelectObject(hdc, oldFont);
                 DeleteObject(font);
@@ -75,8 +100,21 @@ namespace Overlay {
                 EndPaint(hwnd, &ps);
                 return 0;
             }
+            case WM_LBUTTONDOWN: {
+                int x = LOWORD(lParam);
+                RECT r;
+                GetClientRect(hwnd, &r);
+                // If user clicks the stop button area on the right, stop recording!
+                if (x >= r.right - 38) {
+                    Core::Engine::Instance().StopRecording();
+                    return 0;
+                }
+                // Otherwise allow dragging
+                SendMessageW(hwnd, WM_NCLBUTTONDOWN, HTCAPTION, lParam);
+                return 0;
+            }
             case WM_NCHITTEST:
-                return HTCAPTION; // Allow dragging HUD smoothly anywhere on screen
+                return HTCAPTION; // Dragging anywhere on pill
             default:
                 return DefWindowProcW(hwnd, msg, wParam, lParam);
         }
@@ -96,13 +134,14 @@ namespace Overlay {
         RegisterClassExW(&wc);
 
         int screenW = GetSystemMetrics(SM_CXSCREEN);
-        int hudW = 105;
-        int hudH = 36;
-        int posX = screenW - hudW - 40;
-        int posY = 40;
+        // Prominent, enlarged floating indicator pill (180 x 52)
+        int hudW = 180;
+        int hudH = 52;
+        int posX = screenW - hudW - 48;
+        int posY = 48;
 
         m_hwnd = CreateWindowExW(
-            WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+            WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
             wc.lpszClassName,
             L"ScreenRecorderHUD",
             WS_POPUP | WS_VISIBLE,
@@ -114,11 +153,11 @@ namespace Overlay {
 
         SetWindowLongPtrW(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-        // Critical requirement: Exclude overlay from capture via Windows API
+        // Critical requirement: Exclude overlay window from screen capture
         SetWindowDisplayAffinity(m_hwnd, WDA_EXCLUDEFROMCAPTURE);
 
-        // Rounded pill capsule region
-        HRGN rgn = CreateRoundRectRgn(0, 0, hudW, hudH, hudH, hudH);
+        // Smooth rounded capsule shape (radius 26 = half of 52)
+        HRGN rgn = CreateRoundRectRgn(0, 0, hudW + 1, hudH + 1, hudH, hudH);
         SetWindowRgn(m_hwnd, rgn, TRUE);
 
         return true;

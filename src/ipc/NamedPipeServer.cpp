@@ -94,11 +94,22 @@ namespace Recorder::Ipc {
 
     bool NamedPipeServer::SendCommand(const std::string& cmd, std::string& outResponse, const std::wstring& pipeName) {
 #if defined(_WIN32)
-        HANDLE hPipe = CreateFileW(
-            pipeName.c_str(),
-            GENERIC_READ | GENERIC_WRITE,
-            0, nullptr, OPEN_EXISTING, 0, nullptr
-        );
+        HANDLE hPipe = INVALID_HANDLE_VALUE;
+        for (int attempts = 0; attempts < 30; ++attempts) {
+            hPipe = CreateFileW(
+                pipeName.c_str(),
+                GENERIC_READ | GENERIC_WRITE,
+                0, nullptr, OPEN_EXISTING, 0, nullptr
+            );
+            if (hPipe != INVALID_HANDLE_VALUE) {
+                break;
+            }
+            if (GetLastError() == ERROR_PIPE_BUSY) {
+                WaitNamedPipeW(pipeName.c_str(), 100);
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            }
+        }
 
         if (hPipe == INVALID_HANDLE_VALUE) {
             return false;

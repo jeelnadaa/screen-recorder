@@ -80,6 +80,24 @@ namespace Recorder::Config {
 
             m_presets.push_back(preset);
         }
+
+        // 4. Compact Archive (Storage Saver)
+        {
+            PresetInfo preset;
+            preset.id = L"archive_compact";
+            preset.name = L"Compact Archive";
+            preset.description = L"Space-saving 30 FPS HEVC encoding with CQP for long recordings and meeting archives.";
+            
+            preset.settings.video.codec = Core::VideoCodec::HEVC;
+            preset.settings.video.bitrateMode = Core::BitrateMode::CQP;
+            preset.settings.video.rateControlMode = Core::RateControlMode::CFR;
+            preset.settings.video.cqpQuality = 24;
+            preset.settings.video.targetFps = 30;
+            preset.settings.video.width = 1920;
+            preset.settings.video.height = 1080;
+
+            m_presets.push_back(preset);
+        }
     }
 
     std::vector<PresetInfo> PresetManager::GetAvailablePresets() const {

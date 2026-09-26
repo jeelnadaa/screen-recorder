@@ -134,10 +134,24 @@ add_executable(ScreenRecorderTests
     src/core/StateMachine.cpp
     src/core/EventBus.cpp
     src/mux/MkvMuxer.cpp
+    src/mux/Mp4Remuxer.cpp
+    src/encode/HardwareDetector.cpp
+    src/audio/AudioMixer.cpp
+    src/capture/SourceManager.cpp
+    src/ipc/NamedPipeServer.cpp
 )
 
 target_link_libraries(ScreenRecorderTests PRIVATE
     ole32.lib
+    oleaut32.lib
+    mfplat.lib
+    mfreadwrite.lib
+    mfuuid.lib
+    wmcodecdspuuid.lib
+    d3d11.lib
+    dxgi.lib
+    dwmapi.lib
+    windowsapp.lib
 )
 
 set_target_properties(ScreenRecorderTests PROPERTIES

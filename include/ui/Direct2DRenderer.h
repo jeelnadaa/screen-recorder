@@ -37,6 +37,11 @@ namespace Ui {
 
         void DrawIcon(IconType type, float x, float y, float size, const ColorRGB& color);
 
+        void DrawAppLogo(float cx, float cy, float radius);
+        void DrawToggleSwitch(float x, float y, bool checked, bool hovered = false);
+        void DrawPillButton(float left, float top, float right, float bottom, const std::wstring& text, bool active, bool hovered = false);
+        void DrawSlider(float left, float top, float right, float bottom, float value, const ColorRGB& barColor);
+
         void DrawProgressBar(float left, float top, float right, float bottom, float progress, const ColorRGB& fillColor);
         void DrawVuMeter(float left, float top, float right, float bottom, float level);
 
