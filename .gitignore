@@ -1,0 +1,28 @@
+# Build outputs
+build/
+bin/
+out/
+*.exe
+*.obj
+*.lib
+*.pdb
+*.ilk
+*.exp
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Visual Studio files
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Recorded test media
+*.mkv
+*.mp4
+test_config.json
