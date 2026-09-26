@@ -1,0 +1,142 @@
+[
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/main.cpp",
+    "file": "src/main.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/core/Engine.cpp",
+    "file": "src/core/Engine.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/core/StateMachine.cpp",
+    "file": "src/core/StateMachine.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/core/EventBus.cpp",
+    "file": "src/core/EventBus.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/gpu/D3D11Device.cpp",
+    "file": "src/gpu/D3D11Device.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/gpu/GpuAdapter.cpp",
+    "file": "src/gpu/GpuAdapter.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/gpu/Compositor.cpp",
+    "file": "src/gpu/Compositor.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/capture/SourceManager.cpp",
+    "file": "src/capture/SourceManager.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/capture/WgcEngine.cpp",
+    "file": "src/capture/WgcEngine.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/capture/DxgiDuplicationEngine.cpp",
+    "file": "src/capture/DxgiDuplicationEngine.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/encode/HardwareDetector.cpp",
+    "file": "src/encode/HardwareDetector.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/encode/MftVideoEncoder.cpp",
+    "file": "src/encode/MftVideoEncoder.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/audio/AudioMixer.cpp",
+    "file": "src/audio/AudioMixer.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/audio/MftAudioEncoder.cpp",
+    "file": "src/audio/MftAudioEncoder.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/audio/WasapiAudioEngine.cpp",
+    "file": "src/audio/WasapiAudioEngine.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/mux/MkvMuxer.cpp",
+    "file": "src/mux/MkvMuxer.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/mux/Mp4Remuxer.cpp",
+    "file": "src/mux/Mp4Remuxer.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/replay/CircularBuffer.cpp",
+    "file": "src/replay/CircularBuffer.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/overlay/RecordingHud.cpp",
+    "file": "src/overlay/RecordingHud.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/overlay/Telemetry.cpp",
+    "file": "src/overlay/Telemetry.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/config/Settings.cpp",
+    "file": "src/config/Settings.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/config/PresetManager.cpp",
+    "file": "src/config/PresetManager.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/config/PathTemplates.cpp",
+    "file": "src/config/PathTemplates.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/ipc/NamedPipeServer.cpp",
+    "file": "src/ipc/NamedPipeServer.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/ui/MainWindow.cpp",
+    "file": "src/ui/MainWindow.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/ui/Direct2DRenderer.cpp",
+    "file": "src/ui/Direct2DRenderer.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c src/ui/TrayIcon.cpp",
+    "file": "src/ui/TrayIcon.cpp"
+  },
+  {
+    "directory": "D:/screen-recorder",
+    "command": "clang++ -std=c++20 -Iinclude -Isrc -Itests -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -c tests/TestMain.cpp",
+    "file": "tests/TestMain.cpp"
+  }
+]
