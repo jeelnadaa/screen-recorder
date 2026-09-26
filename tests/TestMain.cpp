@@ -1,9 +1,9 @@
-#include "config/PathTemplates.h"
-#include "config/Settings.h"
-#include "config/PresetManager.h"
-#include "core/StateMachine.h"
-#include "replay/CircularBuffer.h"
-#include "mux/MkvMuxer.h"
+#include "../include/config/PathTemplates.h"
+#include "../include/config/Settings.h"
+#include "../include/config/PresetManager.h"
+#include "../include/core/StateMachine.h"
+#include "../include/replay/CircularBuffer.h"
+#include "../include/mux/MkvMuxer.h"
 #include <iostream>
 #include <filesystem>
 #include <cstdlib>

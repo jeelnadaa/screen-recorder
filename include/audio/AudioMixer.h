@@ -4,7 +4,8 @@
 #include <cstdint>
 #include <atomic>
 
-namespace Recorder::Audio {
+namespace Recorder {
+namespace Audio {
 
     class AudioMixer {
     public:
@@ -24,4 +25,5 @@ namespace Recorder::Audio {
         std::atomic<float> m_micPeak{ 0.0f };
     };
 
-} // namespace Recorder::Audio
+} // namespace Audio
+} // namespace Recorder

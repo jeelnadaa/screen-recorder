@@ -1,16 +1,16 @@
-#include "ui/MainWindow.h"
-#include "core/Engine.h"
-#include "config/Settings.h"
-#include "config/PresetManager.h"
-#include "capture/SourceManager.h"
-#include <iostream>
+#include "../../include/ui/MainWindow.h"
+#include "../../include/core/Engine.h"
+#include "../../include/config/Settings.h"
+#include "../../include/config/PresetManager.h"
+#include "../../include/capture/SourceManager.h"
 
 #if defined(_WIN32)
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 #endif
 
-namespace Recorder::Ui {
+namespace Recorder {
+namespace Ui {
 
     MainWindow::MainWindow() = default;
 
@@ -505,4 +505,5 @@ namespace Recorder::Ui {
     }
 #endif
 
-} // namespace Recorder::Ui
+} // namespace Ui
+} // namespace Recorder
