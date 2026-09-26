@@ -30,4 +30,6 @@ test_config.json
 # Node & Frontend
 node_modules/
 ui-app/
+dist/
+
 

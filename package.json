@@ -5,6 +5,7 @@
   "main": "app/main.js",
   "scripts": {
     "start": "electron .",
+    "package": "electron-packager . ScreenRecorder --platform=win32 --arch=x64 --out=dist --icon=assets/app_logo.ico --overwrite",
     "test": "build\\bin\\Release\\ScreenRecorderTests.exe"
   },
   "repository": {
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/jeelnadaa/screen-recorder#readme",
   "devDependencies": {
-    "electron": "^44.4.5"
+    "electron": "^44.4.5",
+    "electron-packager": "^17.1.2"
   }
 }
